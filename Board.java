@@ -8,6 +8,8 @@
 /** 
  * A Board class for concentration
  */
+import java.util.ArrayList;
+
 public class Board
 {  
   private static String[] tileValues = {"lion", "lion",
@@ -18,6 +20,9 @@ public class Board
                                         "turtle", "turtle"}; 
   private Tile[][] gameboard = new Tile[3][4];
 
+  private ArrayList<Integer> usedRows = new ArrayList<Integer>();
+  private ArrayList<Integer> usedCols = new ArrayList<Integer>();
+
   /**  
    * Constructor for the game. Creates the 2D gameboard
    * by populating it with card values
@@ -25,9 +30,29 @@ public class Board
    */
   public Board()
   {
-   
-    /* your code here */ 
+    // int count=0;
+    // for(int r=0;r<gameboard.length;r++){
+    //   for(int c=0;c<gameboard[0].length;c++){
+    //     gameboard[r][c]=new Tile(tileValues[count]);
+    //     count++;
+    //     //System.out.print(gameboard[r][c]+" ");
+    //   }
+    //   //System.out.println("");
+    //   System.out.println(gameboard);
+    // }
 
+    ArrayList<String> tileValues2 = new ArrayList<String>();
+    for(String s : tileValues){
+      tileValues2.add(s);
+    }
+
+    for(int r=0;r<gameboard.length;r++){
+      for(int c=0;c<gameboard[0].length;c++){
+        int x = (int)(Math.random()*tileValues2.size());
+        gameboard[r][c]= new Tile(tileValues2.remove(x));
+      }
+    }
+    System.out.println(gameboard); 
   }
 
  /** 
@@ -39,12 +64,20 @@ public class Board
    * 
    * @return a string represetation of the board
    */
-  public String toString()
-  {
- 
-    /* your code here */
- 
-    return "";
+  public String toString(){
+    String end = "";
+    for(int r=0;r<gameboard.length;r++){
+      for(int c=0;c<gameboard[0].length;c++){
+        if(gameboard[r][c].isShowingValue()){
+          end+=gameboard[r][c]+"\t";
+        } 
+        else{
+          end+=gameboard[r][c].getHidden()+"\t";
+        }
+      }
+      end+="\n"; 
+    }
+    return end;
   }
 
   /** 
@@ -57,9 +90,13 @@ public class Board
    */
   public boolean allTilesMatch()
   {
-
-    /* your code  here */
-    
+    for(int r=0;r<gameboard.length;r++){
+      for(int c=0;c<gameboard[0].length;c++){
+        if(gameboard[r][c].matched()==false){
+          return false;
+        } 
+      }
+    }    
     return true;
   }
 
@@ -76,8 +113,7 @@ public class Board
    */
   public void showValue (int row, int column)
   {
-   
-    /* your code here */
+    gameboard[row][column].show();
   }  
 
   /** 
@@ -101,9 +137,22 @@ public class Board
   {
     String msg = "";
 
-     /* your code here */
+    if(gameboard[row1][col1].getValue()==gameboard[row2][col2].getValue()){
+      msg="Match found!";
+      gameboard[row1][col1].foundMatch();
+      gameboard[row2][col2].foundMatch();
+      usedRows.add(row1);
+      usedRows.add(row2);
+      usedCols.add(col1);
+      usedCols.add(col2);
+    }
+    else{
+      msg="Match not found.";
+      gameboard[row1][col1].hide();
+      gameboard[row2][col2].hide();
+    }
     
-     return msg;
+    return msg;
   }
 
   /** 
@@ -116,9 +165,15 @@ public class Board
    */
   public boolean validateSelection(int row, int col)
   {
-
-    /* your code here */
-
+    if(row>2 || col>3)
+      return false;
+    
+    for(int i = 0; i<usedRows.size();i++){
+      if(row==usedRows.get(i) && col==usedCols.get(i)){
+        System.out.println("Already used");
+        return false;
+      }
+    }
     return true;
   }
 
